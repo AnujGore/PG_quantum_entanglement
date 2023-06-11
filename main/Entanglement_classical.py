@@ -107,12 +107,12 @@ bell_size = (2, 2)
 pure_state = [1, 0, 0, 0]
 pure_size = (2, 2)
 
-measurement_size = 8
-Test_states = random_pure_state(8)
-test_size = (2, 4)
+measurement_size = 16
+Test_states = random_pure_state(measurement_size)
+test_size = (2, 8)
 
 eigen = Entanglement_quantifier.eigenvalues(Test_states, test_size)
-print("Measurement size: {}; qudit: {}".format(measurement_size, test_size[0]))
+print("Measurement size: {}; qudit: {}; number of qudits: {}".format(measurement_size, test_size[0], test_size[1]))
 print("Schmidt Gap: ", Entanglement_quantifier.schmidtGap(eigen))
 print("Von Neumann: ", Entanglement_quantifier.vonNeumann(eigen))
 
