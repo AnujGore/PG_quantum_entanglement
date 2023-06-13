@@ -1,5 +1,4 @@
 import numpy as np
-from numba import prange
 
 class Basis_vectors:
     def __init__(self, list_of_basis_states, orthogonal = True) -> None:
@@ -81,7 +80,7 @@ class random_state_generator():
 
 
 
-def random_states_generator(number_of_states, dimension):
+def multiple_states(number_of_states, dimension):
     '''
     Based on random_pure_state(n)
     '''

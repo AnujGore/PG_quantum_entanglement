@@ -10,21 +10,16 @@ sys.path.append("C:\\Users\\anuj_\\Documents\\UCL\\Individual Research Project\\
 from pennylane import pennylane as qml
 
 qubits = 2
-size =(2, 2)
 
-dev = qml.device("default.mixed", wires=int(np.log2(qubits)))
+dev = qml.device("default.mixed", wires=int(np.log2(qubits) + 1))
 @qml.qnode(dev)
-def circuit(rho):
-    qml.QubitDensityMatrix(rho, wires=[i for i in range(int(np.log2(qubits)))])
-    return qml.state()
+def circuit(rho, **kwargs):
+    observables = kwargs.pop("observable")
+    qml.QubitDensityMatrix(rho, wires=[i for i in range(int(np.log2(qubits))+1)])
+    return [qml.expval(o) for o in observables]
 
 new_state = random_state_generator(qubits)
 
-state = new_state.state
+rho = new_state.densityMat()[0]
 
-print("State is: {}".format(state))
-
-eigenVals = Entanglement_quantifier.eigenvalues(state)
-print("Eigenvalues after SVD: {}".format(eigenVals))
-print("Schmidt Gap: {}".format(Entanglement_quantifier.schmidtGap(eigenVals)))
-print("Von Neumann: {}".format(Entanglement_quantifier.vonNeumann(eigenVals)))
+print(rho)
