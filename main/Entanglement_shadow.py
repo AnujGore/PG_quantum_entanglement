@@ -6,8 +6,6 @@ import numpy as np
 
 from numba import prange
 
-np.random.seed(666)
-
 def letter_val (num_list):
     return_list = []
     for i in prange(len(num_list)):
@@ -47,7 +45,7 @@ def classical_shadow(activated_qubit, params, shadow_size, num_qubits):
 
     return(outcomes)
 
-num_qubits = 1
+num_qubits = 4
 
 dev = qml.device("default.qubit", wires = num_qubits, shots = 1)
 
@@ -60,43 +58,3 @@ def local_rotation(params, **kwargs):
         qml.RZ(params[w][2], wires = w)
     
     return [qml.expval(o) for o in observables]
-
-params = np.random.rand(num_qubits,3)
-print(params)
-num_snaps = 10000
-shadow = classical_shadow(local_rotation, params, num_snaps, num_qubits)
-shadow_shadow = shadow[:, :num_qubits]
-shadow_measure = shadow[:, num_qubits:]
-
-def Bloch_estimate(shadows, measure):
-    """
-    Find the projection of each measurement onto the Bloch Sphere. 
-    Theoretically, we should be able to recreate the qubit from this sphere
-
-    Args:
-        shadows (array): Array of shadows seen from the shadow calculation
-        measure (array): Measurement axis (Pauli measurement)
-    
-    Returns:
-        Rotatory List
-    """
-
-    num_qubits = len(shadows[0])
-    if TypeError: num_qubits = 1
-    num_iters = len(shadows)
-
-    qubit_vals = []
-    
-    for qubit in range(num_qubits):
-        Pauli_X = 0; Pauli_Y = 0; Pauli_Z = 0
-        for outcome in prange(num_iters):
-            measurement = measure[outcome]
-            if measurement == 0: Pauli_X += shadows[outcome]
-            elif measurement == 1: Pauli_Y += shadows[outcome]
-            elif measurement == 2: Pauli_Z += shadows[outcome]
-
-        qubit_vals.append([Pauli_X/num_iters, Pauli_Y/num_iters, Pauli_Z/num_iters])
-
-    return qubit_vals
-
-print(Bloch_estimate(shadow_shadow, shadow_measure))

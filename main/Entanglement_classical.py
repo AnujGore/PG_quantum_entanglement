@@ -1,83 +1,22 @@
-#First we need to create a set of random pure states. This can be done by creating a set of vectors with n dimensions
-#Which is normalized to 1.
-
 import numpy as np
-
-def random_pure_state(n):
-    '''
-    random_pure_state(n)
-
-     - n is the dimensions of the Hilbert space
-
-    returns: Single normalised (pure) state.
-    '''
-
-    mean = [0 for _ in range(n)]
-
-    cov = []
-
-    for one in range(n):
-        cov_vec = [0 for _ in range(n)]
-        cov_vec[one] = 1
-        cov.append(cov_vec)
-
-    return_state_unnormalized = np.random.multivariate_normal(mean, cov)
-    normalisation_factor = np.linalg.norm(return_state_unnormalized)
-    return_state_normalised = return_state_unnormalized/normalisation_factor
-
-    return return_state_normalised
-
-#Now we need to generate m number of random states to evaluate their Schmidt Gap
-
-def random_states_generator(number_of_states, dimension):
-    '''
-    Based on random_pure_state(n)
-    '''
-
-    return_vector = []
-
-    for new_state in range(number_of_states):
-        return_vector.append(random_pure_state(dimension))
-
-
-    return return_vector
-
-#Now we need to calculate the Schmidt Gap between each state
-
-def densityMat(state):
-    '''
-    Finds the density matrix of a state by doing the row and column wise multiplication of the state.
-
-    Doing the column and row wise (conventional way) would return a single value.
-
-    For all not possible values, a 0 value is returned.
-
-    '''
-    return_mat = np.zeros((len(state), len(state)))
-    try:
-        for row in range(len(state)):
-            for col in range(len(state)):
-                return_mat[row][col] = state[row]*state[col]
-    except:
-        pass
-
-    return return_mat
-
-#Now we need to find the Schmidt gap classically
-#For that first, we find the SVD of the density matrix
+import pytest
 
 class Entanglement_quantifier:
     def __init__(self) -> None:
         pass
 
 
-    def eigenvalues(states, size):
+    def eigenvalues(states):
         '''
         SVD_quant quantifies the eigenvalue matrix of the SVD of a state
 
         The input must be greater than 3 and not a prime number as the product of the number of rows and columns 
         is the length of the states.
+
         '''
+        states = states.flatten()
+
+        size = (int(len(states)/2), int(len(states)/2))
 
         rows = size[0]
         cols = size[1]
@@ -102,19 +41,21 @@ class Entanglement_quantifier:
         
 
 bell_state = [1/2, 0, 0, 1/2] #circle with line thru it with a positive sign
-bell_size = (2, 2)
+# bell_size = (2, 2)
 
 pure_state = [1, 0, 0, 0]
-pure_size = (2, 2)
+# pure_size = (2, 2)
 
-measurement_size = 16
-Test_states = random_pure_state(measurement_size)
-test_size = (2, 8)
+def test_bell_state():
+    eigen_bell = Entanglement_quantifier.eigenvalues(bell_state)
+    assert Entanglement_quantifier.schmidtGap(eigen_bell) == 0.0
+    assert Entanglement_quantifier.vonNeumann(eigen_bell) == 1.0
 
-eigen = Entanglement_quantifier.eigenvalues(Test_states, test_size)
-print("Measurement size: {}; qudit: {}; number of qudits: {}".format(measurement_size, test_size[0], test_size[1]))
-print("Schmidt Gap: ", Entanglement_quantifier.schmidtGap(eigen))
-print("Von Neumann: ", Entanglement_quantifier.vonNeumann(eigen))
+def test_pure_0_state():
+    eigen_pure = Entanglement_quantifier.eigenvalues(pure_state)
+    assert Entanglement_quantifier.schmidtGap(eigen_pure) == 1.0
+    assert Entanglement_quantifier.vonNeumann(eigen_pure) == 0.0
+
 
 
 
