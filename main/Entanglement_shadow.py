@@ -6,7 +6,7 @@ import numpy as np
 
 from numba import prange
 
-def classical_shadow(activated_qubit, params, shadow_size, num_qubits):
+def classical_shadow(activated_qubit, params, shadow_size, num_qubits, basis_measurements):
     """
     Given how a state is prepared via the activated qubit function,
     this method finds the Pauli X, Y and Z values of the activated qubit
@@ -22,15 +22,12 @@ def classical_shadow(activated_qubit, params, shadow_size, num_qubits):
         Shadow array: The values of the Pauli X Y and Z
     """
 
-    unitary_ensenmble = [qml.PauliX, qml.PauliY, qml.PauliZ]
+    unitary_ensenmble = [qml.PauliX, qml.PauliY, qml.PauliZ, qml.Identity]
 
-    unitary_picks = np.random.randint(0, 3, size = (shadow_size, num_qubits)) #The picks must be for the number of
-    #shadows and the number of qubits
-
-    outcomes = np.zeros_like(unitary_picks)
+    outcomes = np.zeros_like(basis_measurements)
 
     for ns in prange(shadow_size):
-        obs = [unitary_ensenmble[int(unitary_picks[ns, i])](i) for i in range(num_qubits)]
-        outcomes[ns, :] = activated_qubit(params, observable = obs)
+        obs = [unitary_ensenmble[int(basis_measurements[ns, i])](i) for i in range(num_qubits)]
+        outcomes[ns, :] = activated_qubit(params, observables = obs)
 
-    return(outcomes, unitary_picks)
+    return outcomes

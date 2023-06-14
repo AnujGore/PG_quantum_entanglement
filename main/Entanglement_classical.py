@@ -6,7 +6,7 @@ class Entanglement_quantifier:
         pass
 
 
-    def eigenvalues(states):
+    def eigenvalues(states, size):
         '''
         SVD_quant quantifies the eigenvalue matrix of the SVD of a state
 
@@ -14,9 +14,6 @@ class Entanglement_quantifier:
         is the length of the states.
 
         '''
-        states = states.flatten()
-
-        size = (int(len(states)/2), int(len(states)/2))
 
         rows = size[0]
         cols = size[1]
@@ -41,18 +38,18 @@ class Entanglement_quantifier:
         
 
 bell_state = [1/2, 0, 0, 1/2] #circle with line thru it with a positive sign
-# bell_size = (2, 2)
+bell_size = (2, 2)
 
 pure_state = [1, 0, 0, 0]
-# pure_size = (2, 2)
+pure_size = (2, 2)
 
 def test_bell_state():
-    eigen_bell = Entanglement_quantifier.eigenvalues(bell_state)
+    eigen_bell = Entanglement_quantifier.eigenvalues(bell_state, bell_size)
     assert Entanglement_quantifier.schmidtGap(eigen_bell) == 0.0
     assert Entanglement_quantifier.vonNeumann(eigen_bell) == 1.0
 
 def test_pure_0_state():
-    eigen_pure = Entanglement_quantifier.eigenvalues(pure_state)
+    eigen_pure = Entanglement_quantifier.eigenvalues(pure_state, pure_size)
     assert Entanglement_quantifier.schmidtGap(eigen_pure) == 1.0
     assert Entanglement_quantifier.vonNeumann(eigen_pure) == 0.0
 

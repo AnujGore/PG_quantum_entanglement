@@ -1,6 +1,7 @@
 from random_state_generator import random_state_generator
 from Entanglement_shadow import classical_shadow
 from Entanglement_classical import Entanglement_quantifier
+from Basis_measurement import basis_measurementList
 
 import numpy as np
 
@@ -9,17 +10,35 @@ sys.path.append("C:\\Users\\anuj_\\Documents\\UCL\\Individual Research Project\\
 
 from pennylane import pennylane as qml
 
-qubits = 2
+num_qubits = 2
+wires = [i for i in range(num_qubits)]
 
-dev = qml.device("default.mixed", wires=int(np.log2(qubits) + 1))
+dev = qml.device("default.qubit", wires=num_qubits)
 @qml.qnode(dev)
-def circuit(rho, **kwargs):
-    observables = kwargs.pop("observable")
-    qml.QubitDensityMatrix(rho, wires=[i for i in range(int(np.log2(qubits))+1)])
+def circuit(theta, **kwargs):
+    observables = kwargs.pop("observables")
+    qml.SpecialUnitary(theta, wires=wires)
     return [qml.expval(o) for o in observables]
 
-new_state = random_state_generator(qubits)
+theta = 2*np.pi*np.random.rand(4**num_qubits-1)
 
-rho = new_state.densityMat()[0]
+@qml.qnode(dev)
+def state_circuit(theta):
+    qml.SpecialUnitary(theta, wires= wires)
+    return qml.state()
 
-print(rho)
+state = np.array(state_circuit(theta))
+print(state)
+
+# eigen = Entanglement_quantifier.eigenvalues(state, (num_qubits, num_qubits))
+# print(Entanglement_quantifier.vonNeumann(eigen))
+
+##Shadows below this in this bitch
+
+snaps = 10
+basis_measurements = basis_measurementList(snaps, num_qubits)
+print(basis_measurements)
+
+# sdw = classical_shadow(circuit, theta, 10, num_qubits, basis_measurements)
+
+# print(sdw)
