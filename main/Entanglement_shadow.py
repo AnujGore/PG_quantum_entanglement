@@ -4,8 +4,6 @@ sys.path.append("C:\\Users\\anuj_\\Documents\\UCL\\Individual Research Project\\
 from pennylane import pennylane as qml
 import numpy as np
 
-from numba import prange
-
 def classical_shadow(activated_qubit, params, shadow_size, num_qubits, basis_measurements):
     """
     Given how a state is prepared via the activated qubit function,
@@ -26,7 +24,7 @@ def classical_shadow(activated_qubit, params, shadow_size, num_qubits, basis_mea
 
     outcomes = np.zeros_like(basis_measurements)
 
-    for ns in prange(shadow_size):
+    for ns in range(shadow_size):
         obs = [unitary_ensenmble[int(basis_measurements[ns, i])](i) for i in range(num_qubits)]
         outcomes[ns, :] = activated_qubit(params, observables = obs)
 

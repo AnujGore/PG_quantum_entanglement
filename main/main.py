@@ -1,4 +1,3 @@
-from random_state_generator import random_state_generator
 from Entanglement_shadow import classical_shadow
 from Entanglement_classical import Entanglement_quantifier
 from Basis_measurement import basis_measurementList
@@ -30,15 +29,18 @@ def state_circuit(theta):
 state = np.array(state_circuit(theta))
 print(state)
 
-# eigen = Entanglement_quantifier.eigenvalues(state, (num_qubits, num_qubits))
-# print(Entanglement_quantifier.vonNeumann(eigen))
+eigen = Entanglement_quantifier.eigenvalues(state, (num_qubits, num_qubits))
+print(Entanglement_quantifier.vonNeumann(eigen))
 
 ##Shadows below this in this bitch
 
 snaps = 10
 basis_measurements = basis_measurementList(snaps, num_qubits)
-print(basis_measurements)
 
-# sdw = classical_shadow(circuit, theta, 10, num_qubits, basis_measurements)
+f = open("{}_basis_measurements.txt".format(snaps), "w")
+f.write(np.array2string(basis_measurements))
+f.close()
 
-# print(sdw)
+sdw = classical_shadow(circuit, theta, 10, num_qubits, basis_measurements)
+
+print(sdw)
