@@ -1,4 +1,4 @@
-from Entanglement_shadow import classical_shadow
+from Entanglement_shadow import classical_shadow_manual
 from Entanglement_classical import Entanglement_quantifier
 from Basis_measurement import basis_measurementList
 
@@ -13,11 +13,6 @@ num_qubits = 2
 wires = [i for i in range(num_qubits)]
 
 dev = qml.device("default.qubit", wires=num_qubits)
-@qml.qnode(dev)
-def circuit(theta, **kwargs):
-    observables = kwargs.pop("observables")
-    qml.SpecialUnitary(theta, wires=wires)
-    return [qml.expval(o) for o in observables]
 
 theta = 2*np.pi*np.random.rand(4**num_qubits-1)
 
@@ -30,7 +25,7 @@ state = np.array(state_circuit(theta))
 print(state)
 
 eigen = Entanglement_quantifier.eigenvalues(state, (num_qubits, num_qubits))
-print(Entanglement_quantifier.vonNeumann(eigen))
+print("Von Neumann: {}".format(Entanglement_quantifier.vonNeumann(eigen)))
 
 ##Shadows below this in this bitch
 
@@ -41,6 +36,7 @@ f = open("{}_basis_measurements.txt".format(snaps), "w")
 f.write(np.array2string(basis_measurements))
 f.close()
 
-sdw = classical_shadow(circuit, theta, 10, num_qubits, basis_measurements)
+# sdw = classical_shadow(circuit, theta, snaps, num_qubits, basis_measurements)
+sdw_man = classical_shadow_manual(state, basis_measurements, 10, num_qubits)
 
-print(sdw)
+print(sdw_man)
