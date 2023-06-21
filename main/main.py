@@ -1,4 +1,4 @@
-from Entanglement_shadow import classical_shadow_manual
+from Entanglement_shadow import classical_shadow, classical_shadow_manual
 from Entanglement_classical import Entanglement_quantifier
 from Basis_measurement import basis_measurementList
 
@@ -9,10 +9,12 @@ sys.path.append("C:\\Users\\anuj_\\Documents\\UCL\\Individual Research Project\\
 
 from pennylane import pennylane as qml
 
-num_qubits = 2
-wires = [i for i in range(num_qubits)]
+np.random.seed(666)
 
-dev = qml.device("default.qubit", wires=num_qubits)
+num_qubits = 2
+
+dev = qml.device("default.qubit", wires = num_qubits)
+wires = [i for i in range(num_qubits)]
 
 theta = 2*np.pi*np.random.rand(4**num_qubits-1)
 
@@ -21,22 +23,38 @@ def state_circuit(theta):
     qml.SpecialUnitary(theta, wires= wires)
     return qml.state()
 
-state = np.array(state_circuit(theta))
-print(state)
+@qml.qnode(dev)
+def circuit(theta, **kwargs):
+    observables = kwargs.pop("observable")
+    qml.SpecialUnitary(theta, wires= wires)
+    return [qml.expval(o) for o in observables]
 
-eigen = Entanglement_quantifier.eigenvalues(state, (num_qubits, num_qubits))
-print("Von Neumann: {}".format(Entanglement_quantifier.vonNeumann(eigen)))
+num_snapshots = 10
 
-##Shadows below this in this bitch
+print(theta)
 
-snaps = 10
-basis_measurements = basis_measurementList(snaps, num_qubits)
+params = theta
 
-f = open("{}_basis_measurements.txt".format(snaps), "w")
-f.write(np.array2string(basis_measurements))
-f.close()
+# state = state_circuit(theta)
 
-# sdw = classical_shadow(circuit, theta, snaps, num_qubits, basis_measurements)
-sdw_man = classical_shadow_manual(state, basis_measurements, 10, num_qubits)
+# basis_ids = basis_measurementList(num_snapshots, num_qubits)
 
-print(sdw_man)
+# shadows_recipe = classical_shadow_manual(state, basis_ids, num_snapshots, num_qubits)
+
+# from pennylane.measurements.expval import ExpectationMP
+
+# @qml.qnode(dev)
+# def shadow(recipe):
+#     return_outcome = np.zeros_like(shadows_recipe, dtype = ExpectationMP)
+
+#     for snap in range(len(recipe)):
+#         for qubit in range(len(recipe[snap])):
+#             return_outcome[snap][qubit] = qml.expval(shadows_recipe[snap][qubit]).eigvals
+
+#     return return_outcome
+
+# shadows = shadow(shadows_recipe)
+# print(shadows)
+
+shadows = classical_shadow(circuit, params, num_snapshots, num_qubits)
+print(shadows)
