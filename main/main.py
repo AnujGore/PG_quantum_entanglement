@@ -9,8 +9,6 @@ sys.path.append("C:\\Users\\anuj_\\Documents\\UCL\\Individual Research Project\\
 
 from pennylane import pennylane as qml
 
-np.random.seed(666)
-
 num_qubits = 2
 
 dev = qml.device("default.qubit", wires = num_qubits)
@@ -31,30 +29,17 @@ def circuit(theta, **kwargs):
 
 num_snapshots = 10
 
-print(theta)
-
 params = theta
 
-# state = state_circuit(theta)
+state = state_circuit(theta)
 
-# basis_ids = basis_measurementList(num_snapshots, num_qubits)
+basis_ids = basis_measurementList(num_snapshots, num_qubits)
 
-# shadows_recipe = classical_shadow_manual(state, basis_ids, num_snapshots, num_qubits)
+eigens = Entanglement_quantifier.eigenvalues(state, (num_qubits, num_qubits))
+print(Entanglement_quantifier.vonNeumann(eigens))
 
-# from pennylane.measurements.expval import ExpectationMP
-
-# @qml.qnode(dev)
-# def shadow(recipe):
-#     return_outcome = np.zeros_like(shadows_recipe, dtype = ExpectationMP)
-
-#     for snap in range(len(recipe)):
-#         for qubit in range(len(recipe[snap])):
-#             return_outcome[snap][qubit] = qml.expval(shadows_recipe[snap][qubit]).eigvals
-
-#     return return_outcome
-
-# shadows = shadow(shadows_recipe)
-# print(shadows)
+shadows_manual = classical_shadow_manual(state, basis_ids, num_snapshots, num_qubits)
+print(shadows_manual)
 
 shadows = classical_shadow(circuit, params, num_snapshots, num_qubits)
-print(shadows)
+# print(shadows)

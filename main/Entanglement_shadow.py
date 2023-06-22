@@ -32,46 +32,72 @@ def classical_shadow(activated_qubit, params, shadow_size, num_qubits):
 
     return outcomes
 
-# def to_euler(number):
-#     alpha = np.real(number)
-#     beta = np.imag(number)
 
-#     hypt = np.sqrt(alpha**2 + beta**2)
+import random
 
-#     if alpha == 0:
-#         return np.arccos(beta/hypt)/(np.pi/2)
-#     else:
-#         return np.arcsin(alpha/hypt)/(np.pi/2)
+def biased_coin_toss(p):
+    """
+    Returns a biased toss (biased towards -1)
+    """
+    return 1 if random.random() < p else -1
 
 
-# def expval(basis, state):
-#     state_conj = np.conjugate(state)
-#     bra_matrix_prod = state_conj @ basis
-#     return np.real(bra_matrix_prod @ state)
+def expval(basis, state):
+    """
+    Returns a measurement outcome of a state.
+
+    First calculates the expectation value via <Psi|Obs|Psi>.
+
+    And uses that result as a probabilistic distribution and flips a coin (2 states) based on this probability.
+
+    Args:
+        - Basis: Observable
+        - State: Qubit
+
+    Returns: Qubit-like state made of 1 and -1, according to Observable
+
+    """
+    state_conj = np.conjugate(state)
+    bra_matrix_prod = state_conj @ basis
+    expectation = np.real(bra_matrix_prod @ state)
+
+    # outcome = biased_coin_toss(np.abs(expectation))
+
+    return expectation
+
 
 def classical_shadow_manual(state, basis_measurements, snapshots, num_qubits):
+    """
+    Uses hard coded pauli gates and a predefined random basis state selector to compute the shadows of qubit.
 
-    # pauli_x = np.array([[0.+0.j,1.+0.j],[1.+0.j, 0.+0.j]], dtype=complex)
-    # pauli_y = np.array([[0.+0.j,0.-1.j],[0.+1.j, 0.+0.j]], dtype=complex)
-    # pauli_z = np.array([[1.+0.j,0.+0.j],[0.+0.j, -1.+0.j]], dtype=complex)
-    # identity = np.array([[1.+0.j,0.+0.j],[0.+0.j, 1.+0.j]], dtype=complex)
+    Args:
+        - State: Qubit
+        - basis_measurements: Predefined random basis state selector
+        - snapshots: Number of iterations ran to generate shadows
+        - num_qubits: Number of qubits
+    
+    NOTE: The dimensions of the basis_measurements must equal (snapshots x num_qubits)
 
-    pauli_x = qml.PauliX
-    pauli_y = qml.PauliY
-    pauli_z = qml.PauliZ
-    identity = qml.Identity
+    Returns: basis_measurements dimension-like array with the shadows
+    """
+
+    pauli_x = np.array([[0.+0.j,1.+0.j],[1.+0.j, 0.+0.j]], dtype=complex)
+    pauli_y = np.array([[0.+0.j,0.-1.j],[0.+1.j, 0.+0.j]], dtype=complex)
+    pauli_z = np.array([[1.+0.j,0.+0.j],[0.+0.j, -1.+0.j]], dtype=complex)
+    identity = np.array([[1.+0.j,0.+0.j],[0.+0.j, 1.+0.j]], dtype=complex)
+
 
     unitary_ensemble = [pauli_x, pauli_y, pauli_z, identity]
 
-    outcomes = np.zeros_like(basis_measurements, dtype=qml.operation.Observable)
+    outcomes = np.zeros_like(basis_measurements, dtype=complex)
     
     for i in range(snapshots):
         basis = basis_measurements[i]
         for qubit_no in range(num_qubits):
             basis_qubit = basis[qubit_no]
             pauli_basis = unitary_ensemble[basis_qubit]
-            # qubit = state[2*qubit_no:2*qubit_no+2]
-            outcomes[i][qubit_no] = pauli_basis(qubit_no)
+            qubit = state[2*qubit_no:2*qubit_no+2]
+            outcomes[i][qubit_no] = expval(pauli_basis, qubit)
 
             
     return outcomes
