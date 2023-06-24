@@ -28,9 +28,10 @@ def classical_shadow(activated_qubit, params, shadow_size, num_qubits):
 
     for ns in range(shadow_size):
         obs = [unitary_ensenmble[int(unitary_ids[ns, i])](i) for i in range(num_qubits)]
-        outcomes[ns, :] = activated_qubit(params, observable = obs)
+        outcomes[ns, :] = activated_qubit(params, observable=obs)
 
-    return outcomes
+    # combine the computational basis outcomes and the sampled unitaries
+    return (outcomes, unitary_ids)
 
 
 import random
@@ -61,7 +62,7 @@ def expval(basis, state):
     bra_matrix_prod = state_conj @ basis
     expectation = np.real(bra_matrix_prod @ state)
 
-    # outcome = biased_coin_toss(np.abs(expectation))
+    outcome = biased_coin_toss(np.abs(expectation))
 
     return expectation
 
