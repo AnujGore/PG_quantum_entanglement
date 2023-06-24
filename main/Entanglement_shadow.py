@@ -5,7 +5,7 @@ from pennylane import pennylane as qml
 
 import numpy as np
 
-def classical_shadow(activated_qubit, params, shadow_size, num_qubits):
+def classical_shadow(activated_qubit, params, measurement_basis, shadow_size, num_qubits):
     """
     Given how a state is prepared via the activated qubit function,
     this method finds the Pauli X, Y and Z values of the activated qubit
@@ -21,17 +21,15 @@ def classical_shadow(activated_qubit, params, shadow_size, num_qubits):
         Shadow array: The values of the Pauli X Y and Z
     """
 
-    unitary_ensenmble = [qml.PauliX, qml.PauliY, qml.PauliZ]
+    unitary_ensenmble = [qml.PauliX, qml.PauliY, qml.PauliZ, qml.Identity]
 
-    unitary_ids = np.random.randint(0, 3, size = (shadow_size, num_qubits))
-    outcomes = np.zeros_like(unitary_ids)
+    outcomes = np.zeros_like(measurement_basis)
 
     for ns in range(shadow_size):
-        obs = [unitary_ensenmble[int(unitary_ids[ns, i])](i) for i in range(num_qubits)]
+        obs = [unitary_ensenmble[int(measurement_basis[ns, i])](i) for i in range(num_qubits)]
         outcomes[ns, :] = activated_qubit(params, observable=obs)
 
-    # combine the computational basis outcomes and the sampled unitaries
-    return (outcomes, unitary_ids)
+    return outcomes
 
 
 import random
