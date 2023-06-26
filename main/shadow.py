@@ -2,6 +2,8 @@ from Entanglement_shadow import classical_shadow
 from Entanglement_classical import Entanglement_quantifier
 from scipy import sparse
 
+from Basis_measurement import basis_measurementList
+
 import numpy as np
 
 import sys
@@ -48,17 +50,32 @@ def shadow_Schimdt(num_snapshots, num_qubits, measurement_basis_list):
 
     shadows = classical_shadow(circuit, params, measurement_basis_list, num_snapshots, num_qubits)
 
-    #To make a machine readable training set, we will create a 4xnum_snapshots array to store the shadows.
-    #Unselected measurement basis ids will have 0 or NaN values (need to see if networks can operate with NaN values)
+    #4 different arrays for each observable with the length being number of snaps and width being number of qubits
 
-    shadow_states = np.zeros((num_snapshots, 4))
-    for j, row in enumerate(measurement_basis_list):
-        for i, basis in enumerate(row):
-            shadow_states[j][basis] = shadows[j][i]
+    sigma_x = np.zeros((num_snapshots, num_qubits))
+    sigma_y = np.zeros_like(sigma_x)
+    sigma_z = np.zeros_like(sigma_y)
+    identity = np.zeros_like(sigma_z)
 
-    shadow_states = sparse.csr_matrix(shadow_states) #Compressing the matrix
+    for i, row in enumerate(measurement_basis_list):
+        for j, basis in enumerate(row):
+            if basis == 0: sigma_x[i][j] = shadows[i][j]
+            elif basis == 1: sigma_y[i][j] = shadows[i][j]
+            elif basis == 2: sigma_z[i][j] = shadows[i][j]
+            elif basis == 3: identity[i][j] = shadows[i][j]
+
+    #shadow_states = [sparse.csr_matrix(sigma_x), sparse.csr_matrix(sigma_y), sparse.csr_matrix(sigma_z), sparse.csr_matrix(identity)]
+
+    shadow_states = [sigma_x, sigma_y, sigma_z, identity]
 
     return (shadow_states, Schmidt_gap)
+
+def create_dataset(snaps, qubits, length):
+    measurement_basis_list = basis_measurementList(snaps, qubits)
+
+    dataset = [shadow_Schimdt(snaps, qubits, measurement_basis_list) for _ in range(length)]
+
+    return dataset
 
 
 
