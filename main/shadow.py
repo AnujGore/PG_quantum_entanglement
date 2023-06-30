@@ -71,6 +71,14 @@ def shadow_Schimdt(num_snapshots, num_qubits, measurement_basis_list):
     return (shadow_states, Schmidt_gap)
 
 def create_dataset(snaps, qubits, length):
+    """
+    Creates the dataset based on the shadow_Schmidt function
+
+    Args:
+        - snaps (int): Number of snapshots
+        - qubits (int): Number of qubits
+        - length (int): Size of dataset (number of times the simulation runs and creates different entanglements)
+    """
     measurement_basis_list = basis_measurementList(snaps, qubits)
 
     dataset = [shadow_Schimdt(snaps, qubits, measurement_basis_list) for _ in range(length)]
