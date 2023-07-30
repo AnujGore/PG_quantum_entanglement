@@ -1,21 +1,11 @@
-from shadow import create_dataset
-# from sklearn.model_selection import train_test_split
-# from sklearn.neural_network import MLPRegressor
-# from sklearn.decomposition import PCA
+from shadow import create_dataset, three_D_model
 
-# import matplotlib.pyplot as plt
+shadows, entropy = create_dataset(20, 2, 1)
 
-dataset = create_dataset(10, 2, 1)
+plt = three_D_model(shadows, entropy)
+plt.show()
 
-dataset_X = []
-dataset_Y = []
 
-for data in dataset:
-    dataset_X.append(data[0])
-    dataset_Y.append(data[1])
-
-print(dataset_X)
-print(dataset_Y)
 
 
 

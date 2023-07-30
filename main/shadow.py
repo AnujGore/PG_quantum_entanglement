@@ -5,9 +5,10 @@ from scipy import sparse
 from Basis_measurement import basis_measurementList
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 import sys
-sys.path.append("C:\\Users\\anuj_\\Documents\\UCL\\Individual Research Project\\PG_quantum_entanglement\\pennylane")
+sys.path.append("pennylane")
 
 from pennylane import pennylane as qml
 
@@ -83,9 +84,50 @@ def create_dataset(snaps, qubits, length):
 
     dataset = [shadow_Schimdt(snaps, qubits, measurement_basis_list) for _ in range(length)]
 
-    return dataset
+    shadows = dataset[0][0]
+    entropy = dataset[0][1]
+
+    return np.array(shadows), entropy
 
 
+def three_D_model(shadows, entropy):
+    """
+    Uses matplotlib to visualize the 3D transformation of the data to preserve basis context
+
+    Args:
+        - shadows (array): Shadows of quantum system
+        - entropy (float): Entanglement entropy of system (could be schmidt gap or anything used to quantify entanglement)
+
+    Returns:
+        matplotlib.pyplot.plt
+        (Need to explicize plt.show() to visualize)
+    """
+    ones = []
+    neg_ones = []
+
+    for i in range(len(shadows)):
+        plane = shadows[i]
+        for j in range(len(plane)):
+            iter = plane[j]
+            for k in range(len(iter)):
+                data = iter[k]
+                if data == 1.0 : ones.append([i, j, k])
+                if data == -1.0: neg_ones.append([i, j, k])
+
+
+    ax = plt.figure().add_subplot(projection='3d')
+    for points in ones:
+        ax.scatter(points[0], points[1], points[2], marker = 'o', color = 'red')
+
+    for points in neg_ones:
+        ax.scatter(points[0], points[1], points[2], marker = '^', color = 'green')
+
+    ax.set_xlabel("Observable plane")
+    ax.set_ylabel("Shadow")
+    ax.set_zlabel("Qubit")
+    plt.title(entropy)
+    
+    return plt
 
 
 
