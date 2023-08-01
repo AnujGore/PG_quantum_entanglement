@@ -84,10 +84,10 @@ def create_dataset(snaps, qubits, length):
 
     dataset = [shadow_Schimdt(snaps, qubits, measurement_basis_list) for _ in range(length)]
 
-    shadows = dataset[0][0]
-    entropy = dataset[0][1]
+    shadows = [np.array(dataset[val][0]) for val in range(len(dataset))]
+    entropy = [dataset[val][1] for val in range(len(dataset))]
 
-    return np.array(shadows), entropy
+    return shadows, entropy
 
 
 def three_D_model(shadows, entropy):
