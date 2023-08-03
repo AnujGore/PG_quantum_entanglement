@@ -3,6 +3,7 @@ import keras
 from keras import layers
 import numpy as np
 from sklearn.decomposition import KernelPCA
+from sklearn.manifold import Isomap
 
 class CNNs(keras.layers.Layer):
   
@@ -66,6 +67,24 @@ class CNNs(keras.layers.Layer):
     
       kernel_pca.fit(np.array(simulation_flattened))
       training_X.append(kernel_pca.transform(np.array(simulation_flattened)))
+
+    return training_X
+  
+  def diffusion_map(input_4D_array):
+
+    diff_maps = Isomap(n_components=4)
+
+    training_X = []
+
+    for simulation in input_4D_array:
+      simulation = np.transpose(simulation, (1, 0, 2))
+      simulation_flattened = []
+      for iteration in simulation: 
+          iteration = np.array(iteration).flatten()
+          simulation_flattened.append(iteration)
+    
+      diff_maps.fit(np.array(simulation_flattened))
+      training_X.append(diff_maps.transform(np.array(simulation_flattened)))
 
     return training_X
 
