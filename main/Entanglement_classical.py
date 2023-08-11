@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 class Entanglement_quantifier:
     def __init__(self) -> None:

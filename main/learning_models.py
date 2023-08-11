@@ -205,6 +205,8 @@ class CNNs(keras.layers.Layer):
     model = keras.Model(inputs, output, name = "2dCNN")
 
     return model
+  
+
      
 
 
