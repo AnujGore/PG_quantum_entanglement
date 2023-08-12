@@ -59,7 +59,10 @@ class CNNs(keras.layers.Layer):
        - Model (keras.Model)
 
     """
+   #  inputs = tf.convert_to_tensor((width, height, 1), dtype = tf.float32)
+    inputs = tf.expand_dims((width, height, 1), axis = 0)
     inputs = keras.Input((width, height, 1))
+    
 
     x = layers.Conv2D(filters=16, kernel_size=(width, height), activation = 'relu', padding = "valid")(inputs)
     x = layers.GlobalAveragePooling2D()(x)
@@ -100,6 +103,7 @@ class CNNs(keras.layers.Layer):
       for iteration in simulation: 
           iteration = np.array(iteration).flatten()
           simulation_flattened.append(iteration)
+
     
       kernel_pca.fit(np.array(simulation_flattened))
       training_X.append(kernel_pca.transform(np.array(simulation_flattened)))
