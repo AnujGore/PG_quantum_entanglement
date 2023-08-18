@@ -1,6 +1,14 @@
 import numpy as np
+import os.path
 
 def basis_measurementList(shadow_snapshots, num_qubits):
+    fname = "{}_basis_measurements_{}_qubits.txt".format(shadow_snapshots, num_qubits)
+    if os.path.isfile(fname):
+        basis_measurments = [[int(float(val)) for val in line.strip('\n').replace('[', '').replace(']', '').replace(' ', '')] for line in open(fname)]
+        basis_measurments = np.reshape(basis_measurments, (int(1*shadow_snapshots), num_qubits))
+        return basis_measurments
+    else:
+        pass
 
     basis_measurments = np.random.randint(0, 4, size = (int(1*shadow_snapshots), num_qubits))
 
@@ -8,7 +16,7 @@ def basis_measurementList(shadow_snapshots, num_qubits):
 
     basis_measurments_as_string = np.array2string(basis_measurments)
 
-    f = open("{}_basis_measurements.txt".format(shadow_snapshots), "w")
+    f = open(fname, "w")
     f.write(basis_measurments_as_string)
     f.close()
 
