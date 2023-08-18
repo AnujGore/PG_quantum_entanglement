@@ -7,7 +7,7 @@ from sklearn.manifold import Isomap
 
 class CNNs(keras.layers.Layer):
   
-  def threeDmodel(width, height, depth):
+  def threeDmodel(width, height, depth, activation):
     """
     Three dimensional CNN for feature extraction. 
 
@@ -39,13 +39,13 @@ class CNNs(keras.layers.Layer):
     x = layers.GlobalAveragePooling3D()(x)
     x = layers.BatchNormalization()(x)
 
-    output = layers.Dense(units=1, activation="sigmoid")(x)
+    output = layers.Dense(units=1, activation=activation)(x)
 
     model = keras.Model(inputs, output, name = "3dCNN")
 
     return model
   
-  def twoDmodel(width, height):
+  def twoDmodel(width, height, activation):
     """
     Two dimensional CNN for feature extraction. 
 
@@ -76,7 +76,7 @@ class CNNs(keras.layers.Layer):
     x = layers.GlobalAveragePooling2D()(x)
     x = layers.BatchNormalization()(x)
 
-    output = layers.Dense(units=1, activation="sigmoid")(x)
+    output = layers.Dense(units=1, activation=activation)(x)
 
     model = keras.Model(inputs, output, name = "2dCNN")
 
