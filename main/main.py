@@ -83,11 +83,11 @@ activation_4 = natural_log
 
 model = keras.Sequential([keras.layers.Flatten(), 
                           # keras.layers.Dense(1024, activation = activation), 
-                          keras.layers.Dense(512, activation = activation),
+                          keras.layers.Dense(512, activation = activation_4),
                           # keras.layers.Dense(256, activation = activation), 
                           # keras.layers.Dense(128, activation = activation_4),
                         #   keras.layers.Dense(64, activation = activation),
-                          keras.layers.Dense(2, activation = activation_2)
+                          keras.layers.Dense(2, activation = activation)
                         ])
 
 
@@ -142,7 +142,6 @@ end = time.time()
 
 print("Training Loss: ", np.mean(training_loss)*100)
 print("Test Loss: ", np.mean(test_loss)*100)
-print("Difference in Loss: ", np.mean(test_loss)*100 - np.mean(training_loss)*100)
 print("Time taken: ", end-start)
 print("Memory usage: ", tracemalloc.get_tracemalloc_memory())
 print("Parameters used: ", model.count_params())
