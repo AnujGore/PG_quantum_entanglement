@@ -59,7 +59,7 @@ class CNNs(keras.layers.Layer):
        - Model (keras.Model)
 
     """
-   #  inputs = tf.convert_to_tensor((width, height, 1), dtype = tf.float32)
+    
     inputs = tf.expand_dims((width, height, 1), axis = 0)
     inputs = keras.Input((width, height, 1))
     
@@ -163,63 +163,4 @@ class CNNs(keras.layers.Layer):
     validation_dataset = (validation_loader.map(dimensionality_change).batch(1))
 
     return train_dataset, validation_dataset
-  
-  def axial_preprocessing(input_3d_array):
-     
-     input_data = [data for data in input_3d_array]
-     
-     x_aligned = np.concatenate(input_data, axis = 1)
-     y_aligned = np.concatenate(input_data, axis = 0)
-
-     input_data = [data for data in np.transpose(input_3d_array, (1, 0, 2))]
-     z_aligned = np.concatenate(input_data, axis = 0)
-
-     return (x_aligned, y_aligned, z_aligned)
-  
-  def twoDmodel_strided(width, height, kernel_size, strides):
-    """
-    Two dimensional CNN for feature extraction. 
-
-    Model is built sequentially with Conv2D + AveragePooling2D + Normalization repeated 3 times.
-
-    Inputs:
-       - width: Width of filter
-       - height: Height of filter
-
-    Returns:
-       - Model (keras.Model)
-
-    """
-    inputs = keras.Input((width, height, 1))
-
-    x = layers.Conv2D(filters=16, kernel_size=kernel_size, strides = strides, activation = 'relu', padding = "valid")(inputs)
-    x = layers.GlobalAveragePooling2D()(x)
-    x = layers.BatchNormalization()(x)
-
-    x = layers.Conv2D(filters=16, kernel_size=(width, height), activation = 'relu', padding = "valid")(inputs)
-    x = layers.GlobalAveragePooling2D()(x)
-    x = layers.BatchNormalization()(x)
-
-    x = layers.Conv2D(filters=16, kernel_size=(width, height), activation = 'relu', padding = "valid")(inputs)
-    x = layers.GlobalAveragePooling2D()(x)
-    x = layers.BatchNormalization()(x)
-
-    output = layers.Dense(units=1, activation="sigmoid")(x)
-
-    model = keras.Model(inputs, output, name = "2dCNN")
-
-    return model
-
-  
-
-     
-
-
-
-
-
-  
-
-
-
   
