@@ -29,16 +29,16 @@ start_mem = tracemalloc.start()
 #         return tf.convert_to_tensor(y[0])
 
 
-shadow_iter = 320; num_qubits = 2; num_simulations = 1000
+shadow_iter = 80; num_qubits = 2; num_simulations = 10
 
 shadows, entropy = create_dataset(shadow_iter, num_qubits, num_simulations)
 
-split = 0.3
+split = 0.2
 
 activator_predef = lambda x: keras.backend.relu(x) + keras.backend.softplus(x)
 
 
-# X_train, x_test, Y_train, y_test = train_test_split(shadows, entropy, test_size=split)
+X_train, x_test, Y_train, y_test = train_test_split(shadows, entropy, test_size=split)
 
 # X_train = np.array(X_train)
 # x_test = np.array(x_test)
@@ -63,17 +63,17 @@ activator_predef = lambda x: keras.backend.relu(x) + keras.backend.softplus(x)
 # model_KPCA = CNNs.twoDmodel(np.shape(X_train_K)[1], np.shape(X_train_K)[2], activator_predef)
 
 
-#LDA reduction
-training_X_Diff = CNNs.diffusion_map(shadows)
+# #LDA reduction
+# training_X_Diff = CNNs.diffusion_map(shadows)
 
-X_train_diff, x_test_diff, Y_train_diff, y_test_diff = train_test_split(training_X_Diff, entropy, test_size=split)
+# X_train_diff, x_test_diff, Y_train_diff, y_test_diff = train_test_split(training_X_Diff, entropy, test_size=split)
 
-X_train_diff = np.array(X_train_diff)
-x_test_diff = np.array(x_test_diff)
-Y_train_diff = np.array(Y_train_diff)
-y_test_diff = np.array(y_test_diff)
+# X_train_diff = np.array(X_train_diff)
+# x_test_diff = np.array(x_test_diff)
+# Y_train_diff = np.array(Y_train_diff)
+# y_test_diff = np.array(y_test_diff)
 
-model_LDA = CNNs.twoDmodel(np.shape(X_train_diff)[1], np.shape(X_train_diff)[2], activator_predef)
+# model_LDA = CNNs.twoDmodel(np.shape(X_train_diff)[1], np.shape(X_train_diff)[2], activator_predef)
 
 # #Simple ANN
 
@@ -101,6 +101,44 @@ activation_2 = "softplus"
 #                         ])
 
 
+# GRU + ANN
+
+# gru_dim = (int(num_simulations*(1-split)), shadow_iter, num_qubits)
+# shadow_dim = np.shape(shadows)
+# print(shadow_dim)
+
+
+# # model = keras.Sequential()
+# # # model.add(keras.layers.Lambda(lambda x: tf.transpose(x, [0, 1, 2])))
+# # # model.add(keras.layers.Lambda(lambda x: x[0, :, :]))
+# # model.add(keras.layers.GRU(80))
+# # model.add(keras.layers.Dense(1, activation = activator_predef))
+
+
+
+# inputs = keras.Input(shadow_dim[1:])
+# # x = keras.layers.Lambda(lambda x: x[0, :, :, :])(inputs)
+# x = keras.layers.GRU(80)(inputs)
+# outputs = keras.layers.Dense(1, activation = activator_predef)(x)
+
+# int(num_simulations*(1-split)),
+# model = keras.Model(inputs = inputs, outputs = outputs)
+
+# model.build(input_shape=shadow_dim)
+# model.summary()
+
+X_train = np.array(X_train)
+x_test = np.array(x_test)
+Y_train = np.array(Y_train)
+y_test = np.array(y_test)
+
+
+model = tf.keras.models.Sequential([
+        tf.keras.layers.GRU(64, return_sequences=True, input_shape=(4, num_qubits)),
+        tf.keras.layers.Dense(num_qubits)
+    ])
+
+model.summary()
 
 # Compile model.
 
@@ -108,20 +146,20 @@ epochs = 100
 activator_s = "Self"
 activator_pre = "Predefined"
 
-# model.compile(loss="MeanSquaredLogarithmicError",optimizer=keras.optimizers.Adam())
-# history = model.fit(X_train, Y_train, epochs = epochs, validation_data= (x_test, y_test))
+model.compile(loss="MeanSquaredError",optimizer=keras.optimizers.Adam())
+history = model.fit(X_train, Y_train, epochs = epochs, validation_data= (x_test, y_test))
 
 # model_3D.compile(loss="MeanSquaredLogarithmicError",optimizer=keras.optimizers.Adam())
 # history_3D = model_3D.fit(training_set_3d, validation_data=validation_set_3d, epochs=epochs, shuffle=True)
 
-# model_KPCA.compile(loss="MeanSquaredLogarithmicError",optimizer=keras.optimizers.Adam())
+# model_KPCA.compile(loss="MeanSquaredError",optimizer=keras.optimizers.Adam())
 # history_KPCA = model_KPCA.fit(X_train_K, Y_train_K, epochs = epochs, validation_data= (x_test_K, y_test_K))
 
-model_LDA.compile(loss="MeanSquaredError",optimizer=keras.optimizers.Adam())
-history_LDA = model_LDA.fit(X_train_diff, Y_train_diff, epochs = epochs, validation_data= (x_test_diff, y_test_diff))
+# model_LDA.compile(loss="MeanSquaredError",optimizer=keras.optimizers.Adam())
+# history_LDA = model_LDA.fit(X_train_diff, Y_train_diff, epochs = epochs, validation_data= (x_test_diff, y_test_diff))
 
-# training_loss = history.history['loss']
-# test_loss = history.history['val_loss']
+training_loss = history.history['loss']
+test_loss = history.history['val_loss']
 
 # training_loss_3D = history_3D.history['loss']
 # test_loss_3D = history_3D.history['val_loss']
@@ -129,10 +167,10 @@ history_LDA = model_LDA.fit(X_train_diff, Y_train_diff, epochs = epochs, validat
 # training_loss_KPCA = history_KPCA.history['loss']
 # test_loss_KPCA = history_KPCA.history['val_loss']
 
-training_loss_LDA = history_LDA.history['loss']
-test_loss_LDA = history_LDA.history['val_loss']
+# training_loss_LDA = history_LDA.history['loss']
+# test_loss_LDA = history_LDA.history['val_loss']
 
-epoch_count = range(1, len(training_loss_LDA) + 1)
+epoch_count = range(1, len(training_loss) + 1)
 
 # plt.plot(epoch_count, training_loss, 'r--', label = "ANN (Training)")
 # plt.plot(epoch_count, test_loss, 'b-', label = "ANN (Testing)")
@@ -140,25 +178,20 @@ epoch_count = range(1, len(training_loss_LDA) + 1)
 # plt.plot(epoch_count, test_loss_3D, 'b-', label = "3dConv (testing)")
 # plt.plot(epoch_count, training_loss_KPCA, 'g--', label = "KPCA DimRed (training)")
 # plt.plot(epoch_count, test_loss_KPCA, 'g-', label = "KPCA DimRed (testing)")
-plt.plot(epoch_count, training_loss_LDA, 'm--', label = "Diff DimRed (training)")
-plt.plot(epoch_count, test_loss_LDA, 'm-', label = "Diff DimRed (testing)")
-plt.legend(loc = "best")
-plt.xlabel('Epoch')
-plt.ylabel('Loss (Mean Squared Error Loss)')
-plt.title("Mean Squared Error Loss vs Epochs; Split = %.2f; Activator = %s" %(split, activator_pre))
+# plt.plot(epoch_count, training_loss_LDA, 'm--', label = "Diff DimRed (training)")
+# plt.plot(epoch_count, test_loss_LDA, 'm-', label = "Diff DimRed (testing)")
+# plt.legend(loc = "best")
+# plt.xlabel('Epoch')
+# plt.ylabel('Loss (Mean Squared Error Loss)')
+# plt.title("Mean Squared Error Loss vs Epochs; Split = %.2f; Activator = %s" %(split, activator_pre))
 
-plt.show()
+# plt.show()
 
-# end = time.time()
+end = time.time()
 
-# print("Training Loss: ", np.mean(training_loss_LDA)*100)
-# print("Test Loss: ", np.mean(test_loss_LDA)*100)
-# print("Time taken: ", end-start)
-# print("Memory usage: ", tracemalloc.get_tracemalloc_memory())
-# print("Parameters used: ", model_LDA.count_params())
-# tracemalloc.stop()
-
-# # plt.text(30, max(training_loss), "Memory usage: ")
-
-
-# # print("Size of model: ", model_LDA.count_params())
+print("Training Loss: ", np.mean(training_loss)*100)
+print("Test Loss: ", np.mean(test_loss)*100)
+print("Time taken: ", end-start)
+print("Memory usage: ", tracemalloc.get_tracemalloc_memory())
+print("Parameters used: ", model.count_params())
+tracemalloc.stop()
