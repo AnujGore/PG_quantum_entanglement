@@ -15,7 +15,7 @@ import time
 start = time.time()
 start_mem = tracemalloc.start()
 
-shadow_iter = 320; num_qubits = 2; num_simulations = 1000
+shadow_iter = 320; num_qubits = 4; num_simulations = 1000
 
 shadows, entropy = create_dataset(shadow_iter, num_qubits, num_simulations)
 
@@ -81,7 +81,7 @@ model = keras.Sequential([keras.layers.Flatten(),
                         ])
 
 
-# # #GRU + ANN
+# #GRU + ANN
 
 # shadows = np.transpose(shadows, (0, 2, 3, 1))
 
@@ -110,7 +110,7 @@ model = keras.Sequential([keras.layers.Flatten(),
 
 # Compile model.
 
-epochs = 40
+epochs = 50
 
 model.compile(loss="MeanSquaredLogarithmicError",optimizer=keras.optimizers.Adam())
 history = model.fit(X_train, Y_train, epochs = epochs, validation_data= (x_test, y_test))

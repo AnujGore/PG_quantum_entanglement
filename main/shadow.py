@@ -47,7 +47,7 @@ def shadow_Schimdt(num_snapshots, num_qubits, measurement_basis_list):
     state_coeff = state_circuit(theta)
 
     eiges = Entanglement_quantifier.eigenvalues(state_coeff, (num_qubits, num_qubits))
-    Schmidt_gap = Entanglement_quantifier.schmidtGap(eiges)
+    Schmidt_gap = Entanglement_quantifier.vonNeumann(eiges)
 
     shadows = classical_shadow(circuit, params, measurement_basis_list, num_snapshots, num_qubits)
 
