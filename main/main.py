@@ -110,9 +110,9 @@ model = keras.Sequential([keras.layers.Flatten(),
 
 # Compile model.
 
-epochs = 50
+epochs = 100
 
-model.compile(loss="MeanSquaredLogarithmicError",optimizer=keras.optimizers.Adam())
+model.compile(loss="MeanSquaredError",optimizer=keras.optimizers.Adam())
 history = model.fit(X_train, Y_train, epochs = epochs, validation_data= (x_test, y_test))
 
 # # model_3D.compile(loss="MeanSquaredLogarithmicError",optimizer=keras.optimizers.Adam())
@@ -148,8 +148,8 @@ plt.plot(epoch_count, test_loss, 'r-', label = "ANN (Testing)")
 # plt.plot(epoch_count, test_loss_LDA, 'm-', label = "Diff DimRed (testing)")
 plt.legend(loc = "best")
 plt.xlabel('Epoch')
-plt.ylabel('Loss (Logarithmic Loss)')
-plt.title("Logarithmic Loss vs Epochs; Split = %.2f" %(split))
+plt.ylabel('Loss (Mean Squared Error Loss)')
+plt.title("Mean Sqaured Error Loss vs Epochs; Split = %.2f" %(split))
 
 plt.show()
 
