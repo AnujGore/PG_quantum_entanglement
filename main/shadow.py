@@ -7,10 +7,7 @@ from Basis_measurement import basis_measurementList
 import numpy as np
 import matplotlib.pyplot as plt
 
-import sys
-sys.path.append("pennylane")
-
-from pennylane import pennylane as qml
+import pennylane as qml
 
 def shadow_Schimdt(num_snapshots, num_qubits, measurement_basis_list):
     """
